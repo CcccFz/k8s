@@ -1,3 +1,12 @@
+- [服务器准备](#服务器准备)
+- [安装Kubeadm (两台服务器都需要做以下操作)](#安装kubeadm-两台服务器都需要做以下操作)
+    - [安装docker, 修改配置](#安装docker-修改配置)
+    - [安装kubeadm、kubelet、kubectl](#安装kubeadmkubeletkubectl)
+- [安装Master节点（仅在Mater服务器上做）](#安装master节点仅在mater服务器上做)
+- [安装Worker节点（仅在Worker服务器上做）](#安装worker节点仅在worker服务器上做)
+- [在非node节点使用kubectl](#在非node节点使用kubectl)
+
+
 # 服务器准备
 1. 一台作为Master的服务器（2vCPU, 4G, Ubuntu 20.04）
 2. 一台作为Worker的服务器（2vCPU, 4G, Ubuntu 20.04）
@@ -128,53 +137,3 @@ kubeadm join x.x.x.x:6443 --token tv9mkx.tw7it9vphe158e74 \ --discovery-token-ca
 1. 服务器，和k8s节点服务器需要在同一局域网（否则得使用使用公网SLB等计入方式）、
 2. 将master服务器上的kubectl二进制程序，拷贝到服务器上；或直接在服务器上，安装相同版本的kubectl
 3. 将master服务器上的~/.kube/config文件，拷贝到服务器的~/.kube/目录下
-
-
-# kubectl自动补全
-```bash
-apt install -y bash-completion
-source /usr/share/bash-completion/bash_completion
-echo 'source <(kubectl completion bash)' >>~/.bashrc
-```
-
-
-
-# 安装kubens, 快速切换namespace
-```bash
-git clone https://github.com/ahmetb/kubectx
-ln -s kubectx/kubens /usr/local/bin/kubens
-chmod u+x /usr/local/bin/kubens
-```
-
-
-
-# 从私有仓库中下载镜像
-要使k8s能从私有仓库（如，需要登陆的dockerhub或aliyun registry）中下载镜像，需要创建`docker-registry`类型的密钥：
-```bash
-kubectl create secret docker-registry [$Reg_Secret] --docker-server=[$Registry] --docker-username=[$Username] --docker-password=[$Password] --docker-email=[$Email]
-
-# [$Reg_Secret]为密钥的键名称，可自行定义
-# [$Registry]为Docker仓库地址
-# [$Username]为登录Docker仓库的用户名
-# [$Password]为登录Docker仓库的密码
-# [$Email]为邮件地址，该配置项可选填
-```
-
-为namespace的default账号使用密钥的方法：  
-`kubectl get serviceaccounts default -o yaml > sa.yml`
-按注释修改`sa.yml`，并`kubectl apply -f sa.yaml`
-```yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  creationTimestamp: 2015-08-07T22:02:39Z
-  name: default
-  namespace: default
-  resourceVersion: "243024"        # 删除该项
-  selfLink: /api/v1/namespaces/default/serviceaccounts/default
-  uid: 052fb0f4-3d50-11e5-b066-42010af0d7b6
-secrets:
-- name: default-token-uudge
-imagePullSecrets:                 # 增加该项
-- name: [$Reg_Secret]
-```
