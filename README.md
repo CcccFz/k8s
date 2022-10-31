@@ -58,7 +58,8 @@ apt install -y apt-transport-https ca-certificates curl
 
 # 下载k8s源
 curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | sudo apt-key add -
-cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.listdeb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
+cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
 EOF
 apt update
 
@@ -98,7 +99,7 @@ net-conf.json: |
 {
     "Network": "192.180.0.0/16",
     "Backend": {
-    "Type": "vxlan"
+        "Type": "vxlan"
     }
 }
 
