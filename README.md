@@ -145,3 +145,36 @@ git clone https://github.com/ahmetb/kubectx
 ln -s kubectx/kubens /usr/local/bin/kubens
 chmod u+x /usr/local/bin/kubens
 ```
+
+
+
+# 从私有仓库中下载镜像
+要使k8s能从私有仓库（如，需要登陆的dockerhub或aliyun registry）中下载镜像，需要创建`docker-registry`类型的密钥：
+```bash
+kubectl create secret docker-registry [$Reg_Secret] --docker-server=[$Registry] --docker-username=[$Username] --docker-password=[$Password] --docker-email=[$Email]
+
+# [$Reg_Secret]为密钥的键名称，可自行定义
+# [$Registry]为Docker仓库地址
+# [$Username]为登录Docker仓库的用户名
+# [$Password]为登录Docker仓库的密码
+# [$Email]为邮件地址，该配置项可选填
+```
+
+为namespace的default账号使用密钥的方法：  
+`kubectl get serviceaccounts default -o yaml > sa.yml`
+按注释修改`sa.yml`，并`kubectl apply -f sa.yaml`
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  creationTimestamp: 2015-08-07T22:02:39Z
+  name: default
+  namespace: default
+  resourceVersion: "243024"        # 删除该项
+  selfLink: /api/v1/namespaces/default/serviceaccounts/default
+  uid: 052fb0f4-3d50-11e5-b066-42010af0d7b6
+secrets:
+- name: default-token-uudge
+imagePullSecrets:                 # 增加该项
+- name: [$Reg_Secret]
+```
