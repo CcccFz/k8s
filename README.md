@@ -1,3 +1,6 @@
+> 配套视频教程地址：https://www.bilibili.com/video/BV1Tg411P7EB  
+> 配套文档地址：https://k8s.easydoc.net
+
 - [服务器准备](#服务器准备)
 - [安装Kubeadm (两台服务器都需要做以下操作)](#安装kubeadm-两台服务器都需要做以下操作)
     - [安装docker, 修改配置](#安装docker-修改配置)
